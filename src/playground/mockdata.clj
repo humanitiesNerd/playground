@@ -191,6 +191,21 @@
    [2 2 2]
    ])
 
+(def mymatrix
+ [
+  [1 0 0]
+  [1 0 0]
+  [1 0 0]
+ ]
+)
+
+(def myvector
+ [
+  [1 1 1]
+ ]
+)
+
+
 (def dirty-ages
   [
    ;; [timestamp name age]
