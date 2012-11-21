@@ -1,5 +1,5 @@
 (ns playground.mockdata
-  (:require [cascalog.conf :as conf])
+  (:require [cascalog.conf :as conf] cascalog.api)
   (:import [java.io PrintStream]
            [cascalog WriterOutputStream]
            [org.apache.log4j Logger WriterAppender SimpleLayout]))
@@ -204,6 +204,10 @@
   [1 1 1]
  ]
 )
+
+
+
+
 
 
 (def dirty-ages

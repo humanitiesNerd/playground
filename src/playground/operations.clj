@@ -14,3 +14,11 @@
   (let [transposed (i/trans mymatrix)]
    transposed)
 ) 
+
+(defparallelagg dosum :init-var #'identity :combine-var #'identity)
+
+
+;;   (?<- (stdout) [?person] (age ?person 25)) 
+;;   (?<- (stdout) [?person] (person ?person)) 
+;;   (?<- (stdout) [?persona] (person ?persona)) 
+;;   (?<- (stdout) [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)) 
