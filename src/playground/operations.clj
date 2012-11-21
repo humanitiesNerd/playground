@@ -15,7 +15,15 @@
    transposed)
 ) 
 
-(defparallelagg dosum :init-var #'identity :combine-var #'identity)
+(def my-identity [first-argument second-argument]
+  [first-argument second-argument]
+)
+
+(def my-identity2 [first-argument second-argument]
+  [[first-argument second-argument][first-argument second-argument]]
+)
+
+(defparallelagg dosum :init-var #'my-identity :combine-var #'identity)
 
 
 ;;   (?<- (stdout) [?person] (age ?person 25)) 
