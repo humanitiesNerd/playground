@@ -1,0 +1,80 @@
+(cascalog.api/?- "" (stdout) (cascalog.api/<- [?col1 ?col2 ?col3 ?output] (mymatrix ?col1 ?col2 ?col3) (dosum ?col1 :> ?output)))
+
+
+(defn mk-raw-predicate [[op-sym & vars]]
+  [op-sym (v/vars->str vars)])
+
+(def prova (cascalog.rules/build-rule ["?col1" "?col2" "?col3" "?output"] [[mymatrix ["?col1" "?col2" "?col3"]] [dosum ["?col1" :> "?output"]]]))
+
+(defn build-rule [out-vars raw-predicates]
+  (let [raw-predicates (-> raw-predicates
+                           expand-predicate-macros)
+        parsed (p/parse-variables out-vars :?)]
+    (if (seq (parsed :?))
+      (build-query out-vars raw-predicates)
+      (build-predicate-macro (parsed :<<)
+                             (parsed :>>)
+                             raw-predicates))))
+
+
+
+
+{:type :generator, 
+:id "0be64e92-ba69-475e-99b4-711d43113ec1", 
+:join-set-var nil, 
+:ground? true, 
+:sourcemap {"49ac9bd3-b28a-47be-82bf-a4bf4f56c65a" #<MemorySourceTap MemorySourceTap["MemorySourceScheme[[UNKNOWN]->[ALL]]"]["/f944095d-8695-48d0-9f5f-4e142f80d1c2"]"]>}, 
+:pipe #<Each Each(c230ee57-bf40-4e4b-9c54-09bec2812238)[Identity[decl:ARGS]]>, 
+:outfields ["?col1" "?col2" "?col3" "?output"], 
+:trapmap {}}
+
+
+(defn ?-
+  [& bindings]
+  (let [^Flow flow (apply compile-flow bindings)]
+    (.complete flow)
+    (when-not (-> flow .getFlowStats .isSuccessful)
+      (throw-runtime "Flow failed to complete."))))
+
+(defn compile-flow
+  [& args]
+  (let [[flow-name bindings] (rules/parse-exec-args args)
+        [sinks gens] (->> bindings
+                          (map rules/normalize-gen)
+                          (partition 2)
+                          (mapcat (partial apply rules/normalize-sink-connection))
+                          (unweave))
+        gens (map rules/enforce-gen-schema gens)
+        sourcemap (apply merge (map :sourcemap gens))
+        trapmap (apply merge (map :trapmap gens))
+        tails (map rules/connect-to-sink gens sinks)
+        sinkmap (w/taps-map tails sinks)
+        flowdef (-> (FlowDef.)
+                      (.setName flow-name)
+                      (.addSources sourcemap)
+                      (.addSinks sinkmap)
+                      (.addTraps trapmap)
+                      (.addTails (into-array Pipe tails)))]
+    (-> (HadoopFlowConnector.
+         (u/project-merge (conf/project-conf)
+                          {"cascading.flow.job.pollinginterval" 100}))
+        (.connect flowdef))))
+
+
+
+(defn normalize-gen [gen]
+  (if (instance? Subquery gen)
+    (.getCompiledSubquery gen)
+    gen))
+
+
+(defn normalize-sink-connection [sink subquery]
+  (cond (fn? sink) (sink subquery)
+        (map? sink) (normalize-sink-connection (:sink sink) subquery)
+        :else [sink subquery]))
+
+(defn unweave
+  "[1 2 3 4 5 6] -> [[1 3 5] [2 4 6]]"
+  [coll]
+  {:pre [(even? (count coll))]}
+  [(take-nth 2 coll) (take-nth 2 (rest coll))])
