@@ -24,11 +24,15 @@
 )
  
 
+(defmapcatop vector-mult [a b c]
+  [[  [a b c] [1 2 3]  ]]
+)
+
 ;;   (?<- (stdout) [?person] (age ?person 25)) 
 ;;   (?<- (stdout) [?person] (person ?person)) 
 ;;   (?<- (stdout) [?persona] (person ?persona)) 
 ;;   (?<- (stdout) [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)) 
 ;;   (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3))
  
-
+(def query (<- [?tuple1 ?tuple2] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple1 ?tuple2)) )
 
