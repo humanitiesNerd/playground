@@ -11,7 +11,7 @@
                            expand-predicate-macros)
         parsed (p/parse-variables out-vars :?)]
     (if (seq (parsed :?))
-      (build-query out-vars raw-predicates)
+      (build-que
       (build-predicate-macro (parsed :<<)
                              (parsed :>>)
                              raw-predicates))))
@@ -19,13 +19,13 @@
 
 
 
-{:type :generator, 
-:id "0be64e92-ba69-475e-99b4-711d43113ec1", 
-:join-set-var nil, 
-:ground? true, 
-:sourcemap {"49ac9bd3-b28a-47be-82bf-a4bf4f56c65a" #<MemorySourceTap MemorySourceTap["MemorySourceScheme[[UNKNOWN]->[ALL]]"]["/f944095d-8695-48d0-9f5f-4e142f80d1c2"]"]>}, 
-:pipe #<Each Each(c230ee57-bf40-4e4b-9c54-09bec2812238)[Identity[decl:ARGS]]>, 
-:outfields ["?col1" "?col2" "?col3" "?output"], 
+{:type :generato
+:id "0be64e92-ba69-475e-99b4-711d43113ec1",
+:join-set-var nil,
+:ground? true,
+:sourcemap {"49ac9bd3-b28a-47be-82bf-a4bf4f56c65a" #<MemorySourceTap MemorySourceTap["MemorySourceScheme[[UNKNOWN]->[ALL]]"]["/f944095d-8695-48d0-9f5f-4e142f80d1c2"]"]>},
+:pipe #<Each Each(c230ee57-bf40-4e4b-9c54-09bec2812238)[Identity[decl:ARGS]]>,
+:outfields ["?col1" "?col2" "?col3" "?output"],
 :trapmap {}}
 
 
