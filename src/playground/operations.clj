@@ -16,8 +16,8 @@
    transposed)
 )
 
-(defn coremult []
-  (let [x [1 2 3]]
+(defn coremult [vector]
+  (let [x vector]
    (i/mmult x (i/trans x))
    )
 
@@ -25,7 +25,7 @@
  
 
 (defmapcatop vector-mult [a b c]
-  [[  [a b c] [1 2 3]  ]]
+  [[ [ (coremult [a b c]) ] ]]
 )
 
 
@@ -35,6 +35,6 @@
 ;;   (?<- (stdout) [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)) 
 ;;   (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3))
  
-(def query (<- [?tuple1 ?tuple2] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple1 ?tuple2)) )
+(def query (<- [?tuple] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple)) )
 
 
