@@ -22,19 +22,22 @@
    )
 
 )
- 
+
 
 (defmapcatop vector-mult [a b c]
   [[ [ (coremult [a b c]) ] ]]
 )
 
 
-(def prima-query (<- [?person] (age ?person 25))) 
-(def seconda-query (<- [?person] (person ?person))) 
-(def terza-query (<- [?persona] (person ?persona))) 
-(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3))) 
+(def prima-query (<- [?person] (age ?person 25)))
+(def seconda-query (<- [?person] (person ?person)))
+(def terza-query (<- [?persona] (person ?persona)))
+(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
 (def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
- 
+
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple)) )
 
-
+;; il prossimo passo dovrebbe essere
+;; (?- (stdout) prima-query)
+;; m aper ora non trova i simboli "bootstrap" e "<?"
+;; uff
