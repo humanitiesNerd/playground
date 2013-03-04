@@ -6,7 +6,7 @@
 )
 
 ;; let´s bootstrap playground
-(bootstrap)
+(bootstrap-emacs)
 
 (defn transpose
   "can I transpose a matrix with cascalog using incanter.core.trans ?"
@@ -29,11 +29,11 @@
 )
 
 
-;;   (?<- (stdout) [?person] (age ?person 25)) 
-;;   (?<- (stdout) [?person] (person ?person)) 
-;;   (?<- (stdout) [?persona] (person ?persona)) 
-;;   (?<- (stdout) [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)) 
-;;   (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3))
+(def prima-query (<- [?person] (age ?person 25))) 
+(def seconda-query (<- [?person] (person ?person))) 
+(def terza-query (<- [?persona] (person ?persona))) 
+(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3))) 
+(def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
  
 (def query (<- [?tuple1 ?tuple2] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple1 ?tuple2)) )
 
