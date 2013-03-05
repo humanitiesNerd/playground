@@ -6,7 +6,7 @@
 )
 
 ;; let´s bootstrap playground
-(bootstrap-emacs)
+(bootstrap)
 
 (defn transpose
   "can I transpose a matrix with cascalog using incanter.core.trans ?"
