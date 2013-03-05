@@ -20,7 +20,6 @@
   (let [x vector]
    (i/mmult x (i/trans x))
    )
-
 )
 
 
@@ -37,7 +36,7 @@
 
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple)) )
 
-;; il prossimo passo dovrebbe essere
-;; (?- (stdout) prima-query)
-;; m aper ora non trova i simboli "bootstrap" e "<?"
-;; uff
+;; (?- (stdout) query)  riuscita !!
+
+;; Va bene, risolta la questione dei namespaces, riesco a eseguire la query che definii a dicembre e pare emettere una serie di tre matrici, come e` giusto che sia
+;; e ora ?
