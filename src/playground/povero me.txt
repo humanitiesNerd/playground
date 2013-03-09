@@ -1,3 +1,7 @@
+(hfs-textline "/tmp/tuples" :sinkmode :replace)
+(lfs-textline "/tmp/tuples/" :sinkmode :replace)
+
+
 (cascalog.api/?- "" (stdout) (cascalog.api/<- [?col1 ?col2 ?col3 ?output] (mymatrix ?col1 ?col2 ?col3) (dosum ?col1 :> ?output)))
 
 

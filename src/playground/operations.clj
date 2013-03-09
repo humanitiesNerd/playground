@@ -1,5 +1,6 @@
 (ns playground.operations
-  (:use [playground.mockdata])
+  (:use [playground.mockdata]
+        [cascalog.checkpoint])
   (:require
             [incanter.core :as i]
             )
@@ -36,7 +37,20 @@
 
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple)) )
 
+(defn my-workflow []
+  (workflow ["/tmp/boh"]
+            first-step ([:tmp-dirs stage-1]
+                          (query mymatrix stage-1))
+            )
+  )
+
+
 ;; (?- (stdout) query)  riuscita !!
 
-;; Va bene, risolta la questione dei namespaces, riesco a eseguire la query che definii a dicembre e pare emettere una serie di tre matrici, come e` giusto che sia
-;; e ora ?
+
+
+;;(def prova-output (lfs-tap :sink-template :TextDelimited"tmp/provaoutput/file"))
+
+
+
+;; ora il primo workflow restituisce "true" ma dove minchia lo scrive il file ?
