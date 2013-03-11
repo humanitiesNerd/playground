@@ -37,12 +37,17 @@
 
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c) (vector-mult ?a ?b ?c :> ?tuple)) )
 
-(defn my-workflow []
-  (workflow ["/tmp/boh"]
-            first-step ([:tmp-dirs stage-1]
-                          (query mymatrix stage-1))
+(defn my-workflow [input-path output-path]
+  (workflow ["tmp"]
+            only-step ([]
+                          (query mymatrix output-path)
+                          ;;(?- (lfs-textline "madonna" :sinkmode :replace ) query )
+                          )
             )
   )
+
+;; (my-workflow "" "/home/catonano/Berlino/outputDiCascalog")
+
 
 
 ;; (?- (stdout) query)  riuscita !!
