@@ -11,6 +11,7 @@
                 [incanter/incanter-core "1.3.0"]
                 ;;[cascalog-checkpoint "0.2.0"]
                 [cascalog-checkpoint "0.2.0" :exclusions [cascalog]]
+                [cascalog-more-taps "0.3.0"]
                 ]
   :profiles { :dev
                   {:dependencies [
