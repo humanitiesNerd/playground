@@ -5,24 +5,18 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [
-                [org.clojure/clojure "1.4.0"]
-
-                [cascalog "1.10.0"]
+                [org.clojure/clojure "1.5.0"]
+                [cascalog "1.10.2"]
+                [cascalog/cascalog-more-taps "1.10.2"]
                 [incanter/incanter-core "1.3.0"]
-                ;;[cascalog-checkpoint "0.2.0"]
-                [cascalog-checkpoint "0.2.0" :exclusions [cascalog]]
-                [cascalog-more-taps "0.3.0"]
+                [org.clojure/tools.namespace "0.2.4"]
                 ]
   :profiles { :dev
                   {:dependencies [
 
-                                 [org.apache.hadoop/hadoop-core "0.20.2-dev"
+                                 [org.apache.hadoop/hadoop-core "1.0.3"
                                  :exclusions [
-                                             [org.slf4j/slf4j-api]
-                                             [org.slf4j/slf4j-log4j12]
-                                             [log4j]
-                                             [commons-logging]
-                                             commons-codec
+                                            
                                              ]
                                  ]
                                  ]

@@ -1,9 +1,15 @@
 (ns playground.operations
-  (:use [playground.mockdata]
+  (:use 
+        [playground.mockdata]
         [cascalog.checkpoint]
-        [cascalog.more-taps :only (lfs-delimited)])
+        [clojure.tools.namespace.repl :only (refresh)]                
+        [cascalog.more-taps :only (lfs-delimited)]
+                
+  )
+
   (:require
             [incanter.core :as i]
+
             )
 )
 
@@ -44,27 +50,35 @@
   [ [a] [3] ] ;; seq di tuple (ogni tupla deve essere un vettore)
   )
 
-(def prima-query (<- [?person] (age ?person 25)))
-(def seconda-query (<- [?person] (person ?person)))
-(def terza-query (<- [?persona] (person ?persona)))
-(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
-(def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
+;;(def prima-query (<- [?person] (age ?person 25)))
+;;(def seconda-query (<- [?person] (person ?person)))
+;;(def terza-query (<- [?persona] (person ?persona)))
+;;(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
+;;(def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
+
+(def my_source 
+       (lfs-delimited "adult/adult.data"))
+
+;;  (?- (stdout) my_source)
 
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
                ) )
 
+
+
+
 (defn my-workflow [input-path output-path]
   (workflow ["tmp"]
             only-step ([]
                           ;;(query mymatrix output-path)
-                          (?- (lfs-delimited "madonna" :delimiter "k" :sinkmode :replace ) query )
+                          (?- (lfs-delimited output-path :delimiter "k" :sinkmode :replace ) query )
                           )
             )
   )
 
-;; (my-workflow "" "/home/catonano/Berlino/outputDiCascalog")
+;; (my-workflow "" "./outputDiCascalog")
 
 
 
