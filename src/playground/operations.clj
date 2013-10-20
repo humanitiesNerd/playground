@@ -56,8 +56,14 @@
 ;;(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
 ;;(def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
 
+
+;;39, State-gov, 77516, Bachelors, 13, Never-married, Adm-clerical, Not-in-family, White, Male, 2174, 0, 40, United-States, <=50K
 (def my_source 
-       (lfs-delimited "adult/adult.data"))
+       (lfs-delimited "adult/adult.data" 
+                                       :delimiter ", "
+                                       :classes [Integer String Integer String Integer String String String String String Integer Integer Integer String String]
+       )
+)
 
 ;;  (?- (stdout) my_source)
 
