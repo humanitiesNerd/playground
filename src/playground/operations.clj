@@ -116,21 +116,21 @@
                (matrix-sum ?intermediate-matrix :> ?tuple)
                ) )
 
-(def my_query (<- [?age ?workclass ?fnlwgt ?education ?education-num ?marital-status ?occupation ?relationship
+
+
+(defn convert-to-numbers [data-source-tap]
+  (<- [?age ?workclass ?fnlwgt ?education ?education-num ?marital-status ?occupation ?relationship
                    ?race ?sex ?capital-gain ?capital-loss
-                   ?hours-per-week ?native-country ?income-treshold ] (my_source :> ?age ?workclass ?fnlwgt ?education ?education-num
-                                                                                 ?marital-status ?occupation ?relationship ?race
-                                                                                 ?sex ?capital-gain ?capital-loss
-                                                                                 ?hours-per-week ?native-country ?income-treshold)))
-
-
-
+                   ?hours-per-week ?native-country ?income-treshold ] (data-source-tap :> ?age ?workclass ?fnlwgt ?education ?education-num
+                                                                                          ?marital-status ?occupation ?relationship ?race
+                                                                                          ?sex ?capital-gain ?capital-loss
+                                                                                          ?hours-per-week ?native-country ?income-treshold))
+)
 
 (defn my-workflow []
   (workflow ["tmp"]
             only-step ([]
-                          ;;(query mymatrix output-path)
-                          (?- (stdout ) my_query )
+                          (?- (stdout ) (convert-to-numbers my_source) )
                           )
             )
   )
