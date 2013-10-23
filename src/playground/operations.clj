@@ -97,6 +97,13 @@
    }
   )
 
+(def lookup-table
+  {"US" 1
+   "UK" 2
+   "France" 3})
+
+(def input [["US"] ["US"] ["UK"] ["UK"] ["France"]])
+
 (def my_source
        (lfs-delimited "adult/adult.data"
                                        :delimiter ", "
@@ -117,31 +124,33 @@
                ) )
 
 
+(def mockquery
+  (<- [!input !id]
+     (input !input)
+     (get lookup-table !input :> !id)
+  )
+)
+
+(defn dumb [] "ciao")
+
 
 (defn convert-to-numbers [data-source-tap]
   (<- [?age
        ?workclass
-       ?fnlwgt
-       ?education
-       ?education-num
-       ?marital-status
-       ?occupation ?relationship
-       ?race ?sex
-       ?capital-gain
-       ?capital-loss
-       ?hours-per-week
-       ?native-country
-       ?income-treshold ]
+       ]
       (data-source-tap  ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
-                       ?hours-per-week ?native-country ?income-treshold))
+                       ?hours-per-week ?native-country ?income-treshold)
+
+   )
 )
 
 (defn my-workflow []
   (workflow ["tmp"]
             only-step ([]
-                          (?- (stdout ) (convert-to-numbers my_source) )
+                         ;; (?- (stdout ) (convert-to-numbers my_source) )
+                         (?- (stdout) mockquery)
                           )
             )
   )
