@@ -127,7 +127,8 @@
 (def mockquery
   (<- [!input !id]
      (input !input)
-     (get lookup-table !input :> !id)
+     ;;(get-in lookup-table [!input] :> !id)
+     (get lookup-table !input :> id)
   )
 )
 
