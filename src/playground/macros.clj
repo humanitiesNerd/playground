@@ -1,7 +1,7 @@
 (ns playground.macros
   (:use
         [clojure.tools.namespace.repl :only (refresh)]
-       
+
   )
 
 )
@@ -58,4 +58,3 @@
                  ~(symbol   (str  (subs  (str lookup-key) 1) "-out"))
                  )
   )
-

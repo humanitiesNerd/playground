@@ -117,15 +117,15 @@
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
-      (lookup-proxy from-strings-to-numbers :workclass ?workclass :> ?workclass-out)
+      (lookup-proxy  :workclass ?workclass :> ?workclass-out)
       ;;(lookup :workclass)
-      (lookup-proxy from-strings-to-numbers :education ?education :> ?education-out)
-      (lookup-proxy from-strings-to-numbers :marital-status ?marital-status :> ?marital-status-out)
-      (lookup-proxy from-strings-to-numbers :occupation ?occupation :> ?occupation-out)
-      (lookup-proxy from-strings-to-numbers :relationship ?relationship :> ?relationship-out)
-      (lookup-proxy from-strings-to-numbers :race ?race :> ?race-out)
-      (lookup-proxy from-strings-to-numbers :sex ?sex :> ?sex-out)
-      (lookup-proxy from-strings-to-numbers :native-country ?native-country :> ?native-country-out)
+      (lookup-proxy  :education ?education :> ?education-out)
+      (lookup-proxy  :marital-status ?marital-status :> ?marital-status-out)
+      (lookup-proxy  :occupation ?occupation :> ?occupation-out)
+      (lookup-proxy  :relationship ?relationship :> ?relationship-out)
+      (lookup-proxy  :race ?race :> ?race-out)
+      (lookup-proxy  :sex ?sex :> ?sex-out)
+      (lookup-proxy  :native-country ?native-country :> ?native-country-out)
    )
 )
 
