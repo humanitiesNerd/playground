@@ -122,17 +122,18 @@
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
                ) )
-
+(defn lookup-proxy [structure & lookup-keys]
+  (get-in structure (into [] lookup-keys))
+  )
 
 (def mockquery
   (<- [!input !id]
      (input !input)
      ;;(get-in lookup-table [!input] :> !id)
-     (get lookup-table !input :> id)
+     ;;(get lookup-table !input :> id)
+     (lookup-proxy lookup-table !input :> !id)
   )
 )
-
-(defn dumb [] "ciao")
 
 
 (defn convert-to-numbers [data-source-tap]
