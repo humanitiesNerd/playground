@@ -122,6 +122,7 @@
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
                ) )
+
 (defn lookup-proxy [structure & lookup-keys]
   (get-in structure (into [] lookup-keys))
   )
@@ -135,24 +136,44 @@
   )
 )
 
+(defmacro miamacro [n] '(println ~n ))
 
 (defn convert-to-numbers [data-source-tap]
   (<- [?age
-       ?workclass
+       ?workclass-out
+       ?fnlwgt
+       ?education-out
+       ?education-num
+       ?marital-status-out
+       ?occupation-out
+       ?relationship-out
+       ?race-out
+       ?sex-out
+       ?capital-gain
+       ?capital-loss
+       ?hours-per-week
+       ?native-country-out
        ]
       (data-source-tap  ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
-
+      (lookup-proxy from-strings-to-numbers :workclass ?workclass :> ?workclass-out)
+      (lookup-proxy from-strings-to-numbers :education ?education :> ?education-out)
+      (lookup-proxy from-strings-to-numbers :marital-status ?marital-status :> ?marital-status-out)
+      (lookup-proxy from-strings-to-numbers :occupation ?occupation :> ?occupation-out)
+      (lookup-proxy from-strings-to-numbers :relationship ?relationship :> ?relationship-out)
+      (lookup-proxy from-strings-to-numbers :race ?race :> ?race-out)
+      (lookup-proxy from-strings-to-numbers :sex ?sex :> ?sex-out)
+      (lookup-proxy from-strings-to-numbers :native-country ?native-country :> ?native-country-out)
    )
 )
 
 (defn my-workflow []
   (workflow ["tmp"]
             only-step ([]
-                         ;; (?- (stdout ) (convert-to-numbers my_source) )
-                         (?- (stdout) mockquery)
+                         (?- (stdout ) (convert-to-numbers my_source) )
+                        ;; (?- (stdout) mockquery)
                           )
             )
   )
