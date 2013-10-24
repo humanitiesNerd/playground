@@ -4,6 +4,7 @@
         [cascalog.checkpoint]
         [clojure.tools.namespace.repl :only (refresh)]
         [cascalog.more-taps :only (lfs-delimited)]
+        [playground.macros]
 
   )
 
@@ -123,8 +124,8 @@
                (matrix-sum ?intermediate-matrix :> ?tuple)
                ) )
 
-(defn lookup-proxy [structure & lookup-keys]
-  (get-in structure (into [] lookup-keys))
+(defn lookup-proxy [& lookup-keys]
+  (get-in from-strings-to-numbers (into [] lookup-keys))
   )
 
 (def mockquery
@@ -135,8 +136,6 @@
      (lookup-proxy lookup-table !input :> !id)
   )
 )
-
-(defmacro miamacro [n] '(println ~n ))
 
 (defn convert-to-numbers [data-source-tap]
   (<- [?age
@@ -159,6 +158,7 @@
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
       (lookup-proxy from-strings-to-numbers :workclass ?workclass :> ?workclass-out)
+      ;;(lookup :workclass)
       (lookup-proxy from-strings-to-numbers :education ?education :> ?education-out)
       (lookup-proxy from-strings-to-numbers :marital-status ?marital-status :> ?marital-status-out)
       (lookup-proxy from-strings-to-numbers :occupation ?occupation :> ?occupation-out)
