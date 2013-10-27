@@ -69,12 +69,12 @@
 (def input [["US"] ["US"] ["UK"] ["UK"] ["France"]])
 
 (def my_source
-       (lfs-delimited "adult/adult.data"
+       (lfs-delimited "adult/adult.data.numbered"
                                        :delimiter ", "
-                                       :classes [Integer String Integer String Integer
+                                       :classes [Integer Integer String Integer String Integer
                                                  String String String String String Integer
                                                  Integer Integer String String]
-                                       :outfields ["?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
                                                    "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
                                                    "?hours-per-week" "?native-country" "?income-treshold"]
        )
@@ -98,7 +98,8 @@
 ;;)
 
 (defn convert-to-numbers [data-source-tap]
-  (<- [?age
+  (<- [?linenumber
+       ?age
        ?workclass-out
        ?fnlwgt
        ?education-out
@@ -113,7 +114,7 @@
        ?hours-per-week
        ?native-country-out
        ]
-      (data-source-tap  ?age ?workclass ?fnlwgt ?education ?education-num
+      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
