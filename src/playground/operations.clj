@@ -68,8 +68,8 @@
 
 (def input [["US"] ["US"] ["UK"] ["UK"] ["France"]])
 
-(def my_source
-       (lfs-delimited "adult/adult.data.numbered"
+(defn my_source [path-to-the-data-file]
+       (lfs-delimited path-to-the-data-file
                                        :delimiter ", "
                                        :classes [Integer Integer String Integer String Integer
                                                  String String String String String Integer
@@ -130,10 +130,10 @@
    )
 )
 
-(defn my-workflow []
-  (workflow ["tmp"]
+(defn my-workflow [path-to-the-data-file]
+  (workflow ["temporary-folder"]
             only-step ([]
-                         (?- (stdout ) (convert-to-numbers my_source) )
+                         (?- (stdout ) (convert-to-numbers (my_source path-to-the-data-file)) )
                         ;; (?- (stdout) mockquery)
                           )
             )
