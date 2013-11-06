@@ -80,11 +80,25 @@
        )
 )
 
+(defn source-A [path-to-the-data-file]
+       (lfs-delimited path-to-the-data-file
+                                       :delimiter ", "
+                                       :classes [Integer Integer Integer Integer Integer Integer Integer
+                                                 Integer Integer Integer Integer Integer Integer Integer
+                                                 Integer]
+                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+                                                   "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
+                                                   "?hours-per-week" "?native-country" ]
+       )
+)
+
+
 ;;  (?- (stdout) my_source)
 
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
+
                )
   )
 
@@ -147,16 +161,40 @@
       (extract-y ?income-treshold :> ?y)))
 
 
+(comment
+  (defn produce-A [tap]
+    (let [src (lfs-delimited path :delimiter ", " :outfields ["?linenumber" "?age" "workclass"])]
+      (<- [?linenumber ?age ?workclass]
+          (tap ?linenumber ?age ?workclass))
+      )
+    ))
+
+(defn produce-A [tap]
+  (<- [?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+       ?marital-status ?occupation ?relationship ?race
+       ?sex ?capital-gain ?capital-loss
+       ?hours-per-week ?native-country]
+      (tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+           ?marital-status ?occupation ?relationship ?race
+           ?sex ?capital-gain ?capital-loss
+           ?hours-per-week ?native-country))
+  )
+
+
+
 
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
             X ([:tmp-dirs [staging-path]]
                  ;; (?- (stdout ) (produce-X (my_source path-to-the-data-file)) )
-                 (?- (lfs-delimited "X" :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+                 (?- (lfs-delimited "X" :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  ;; (?- (stdout) mockquery)
                  )
             y ([]
                  (?- (lfs-delimited "y" :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
+            A ([]
+                 (?- (stdout) (produce-A (source-A "X")))
+                 )
             )
   )
 
