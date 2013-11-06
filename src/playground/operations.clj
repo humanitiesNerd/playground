@@ -39,8 +39,8 @@
 
 (defparallelagg matrix-sum :init-var #'identity :combine-var #'coresum)
 
-(defmapcatop vector-mult [a b c]
-  [[   (coremult [a b c])  ]]
+(defmapcatop vector-mult [a b c d e f g h i l m n o p]
+  [[   (coremult [a b c d e f g h i l m n o p])  ]]
   )
 
 (defmapcatop vector-mult-tupla-unica [a b c]
@@ -161,23 +161,18 @@
       (extract-y ?income-treshold :> ?y)))
 
 
-(comment
-  (defn produce-A [tap]
-    (let [src (lfs-delimited path :delimiter ", " :outfields ["?linenumber" "?age" "workclass"])]
-      (<- [?linenumber ?age ?workclass]
-          (tap ?linenumber ?age ?workclass))
-      )
-    ))
-
 (defn produce-A [tap]
-  (<- [?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
-       ?marital-status ?occupation ?relationship ?race
-       ?sex ?capital-gain ?capital-loss
-       ?hours-per-week ?native-country]
+  (<- [?final-matrix]
       (tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
            ?marital-status ?occupation ?relationship ?race
            ?sex ?capital-gain ?capital-loss
-           ?hours-per-week ?native-country))
+           ?hours-per-week ?native-country)
+      (vector-mult ?age ?workclass ?fnlwgt ?education ?education-num
+                   ?marital-status ?occupation ?relationship ?race
+                   ?sex ?capital-gain ?capital-loss
+                   ?hours-per-week ?native-country :> ?intermediate-matrix)
+      (matrix-sum ?intermediate-matrix :> ?final-matrix)
+      )
   )
 
 
@@ -186,14 +181,12 @@
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
             X ([:tmp-dirs [staging-X]]
-                 ;; (?- (stdout ) (produce-X (my_source path-to-the-data-file)) )
                  (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
-                 ;; (?- (stdout) mockquery)
                  )
             y ([:tmp-dirs [staging-y]]
                  (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
             A ([:deps X]
-                 (?- (stdout) (produce-A (source-A staging-X)))
+                (?- (stdout) (produce-A (source-A staging-X)))
                  )
             )
   )
