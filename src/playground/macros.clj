@@ -46,10 +46,15 @@
   )
 
 
-(defn lookup-proxy [& lookup-keys]
+(defn convert-to-numbers [& lookup-keys]
   (get-in from-strings-to-numbers (into [] lookup-keys))
   )
 
+(defn extract-y [income-treshold]
+  (if (= income-treshold "<= 50k")
+    0
+    1)
+  )
 
 (defmacro lookup [lookup-key]
   `(lookup-proxy ~lookup-key

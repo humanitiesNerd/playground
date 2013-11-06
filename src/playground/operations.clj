@@ -85,8 +85,14 @@
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
-               ) )
+               )
+  )
 
+
+(defn workflow-demergenza []
+  (workflow ["tmp"]
+            only-step ([]
+                         (?- (stdout) query))))
 
 ;;(def mockquery
 ;;  (<- [!input !id]
@@ -97,7 +103,7 @@
 ;;  )
 ;;)
 
-(defn convert-to-numbers [data-source-tap]
+(defn produce-X [data-source-tap]
   (<- [?linenumber
        ?age
        ?workclass-out
@@ -113,29 +119,44 @@
        ?capital-loss
        ?hours-per-week
        ?native-country-out
+
        ]
       (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
-      (lookup-proxy  :workclass ?workclass :> ?workclass-out)
+      (convert-to-numbers  :workclass ?workclass :> ?workclass-out)
       ;;(lookup :workclass)
-      (lookup-proxy  :education ?education :> ?education-out)
-      (lookup-proxy  :marital-status ?marital-status :> ?marital-status-out)
-      (lookup-proxy  :occupation ?occupation :> ?occupation-out)
-      (lookup-proxy  :relationship ?relationship :> ?relationship-out)
-      (lookup-proxy  :race ?race :> ?race-out)
-      (lookup-proxy  :sex ?sex :> ?sex-out)
-      (lookup-proxy  :native-country ?native-country :> ?native-country-out)
+      (convert-to-numbers  :education ?education :> ?education-out)
+      (convert-to-numbers  :marital-status ?marital-status :> ?marital-status-out)
+      (convert-to-numbers  :occupation ?occupation :> ?occupation-out)
+      (convert-to-numbers  :relationship ?relationship :> ?relationship-out)
+      (convert-to-numbers  :race ?race :> ?race-out)
+      (convert-to-numbers  :sex ?sex :> ?sex-out)
+      (convert-to-numbers  :native-country ?native-country :> ?native-country-out)
+
    )
-)
+  )
+
+(defn produce-y [data-source-tap]
+  (<- [?y]
+      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+                       ?marital-status ?occupation ?relationship ?race
+                       ?sex ?capital-gain ?capital-loss
+                       ?hours-per-week ?native-country ?income-treshold)
+      (extract-y ?income-treshold :> ?y)))
+
+
 
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
-            only-step ([]
-                         (?- (stdout ) (convert-to-numbers (my_source path-to-the-data-file)) )
-                        ;; (?- (stdout) mockquery)
-                          )
+            X ([:tmp-dirs [staging-path]]
+                 ;; (?- (stdout ) (produce-X (my_source path-to-the-data-file)) )
+                 (?- (lfs-delimited "X" :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+                 ;; (?- (stdout) mockquery)
+                 )
+            y ([]
+                 (?- (lfs-delimited "y" :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
             )
   )
 
