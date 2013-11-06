@@ -185,15 +185,15 @@
 
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
-            X ([:tmp-dirs [staging-path]]
+            X ([:tmp-dirs [staging-X]]
                  ;; (?- (stdout ) (produce-X (my_source path-to-the-data-file)) )
-                 (?- (lfs-delimited "X" :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+                 (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  ;; (?- (stdout) mockquery)
                  )
-            y ([]
-                 (?- (lfs-delimited "y" :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
-            A ([]
-                 (?- (stdout) (produce-A (source-A "X")))
+            y ([:tmp-dirs [staging-y]]
+                 (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
+            A ([:deps X]
+                 (?- (stdout) (produce-A (source-A staging-X)))
                  )
             )
   )
