@@ -71,10 +71,10 @@
 (defn my_source [path-to-the-data-file]
        (lfs-delimited path-to-the-data-file
                                        :delimiter ", "
-                                       :classes [Integer Integer String Integer String Integer
+                                       :classes [Integer String Integer String Integer
                                                  String String String String String Integer
                                                  Integer Integer String String]
-                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+                                       :outfields [ "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
                                                    "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
                                                    "?hours-per-week" "?native-country" "?income-treshold"]
        )
@@ -104,7 +104,7 @@
 ;;)
 
 (defn produce-X [data-source-tap]
-  (<- [?linenumber
+  (<- [
        ?age
        ?workclass-out
        ?fnlwgt
@@ -121,7 +121,7 @@
        ?native-country-out
 
        ]
-      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+      (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
@@ -140,23 +140,41 @@
 
 (defn produce-y [data-source-tap]
   (<- [?y]
-      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+      (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
       (extract-y ?income-treshold :> ?y)))
 
-
+(defn produce-A [source-path]
+  (<- [
+       ?age
+       ?workclass
+       ?fnlwgt
+       ?education
+       ?education-num
+       ?marital-status
+       ?occupation
+       ?relationship
+       ?race
+       ?sex
+       ?capital-gain
+       ?capital-loss
+       ?hours-per-week
+       ?native-country]
+      (lfs-delimited source-path :outfields [?age ?workclass ?fnlwgt ?education
+                                             ?education-num ?marital-status ?occupation
+                                             ?relationship ?race ?sex ?capital-gain ?capital-loss
+                                             ?hours-per-week ?native-country])))
 
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
-            X ([:tmp-dirs [staging-path]]
-                 ;; (?- (stdout ) (produce-X (my_source path-to-the-data-file)) )
-                 (?- (lfs-delimited "X" :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
-                 ;; (?- (stdout) mockquery)
+            X-and-y ([:tmp-dirs [staging-X staging-y]]
+                 (?- (lfs-delimited "output-X" :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+                 ;;(?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)))
                  )
-            y ([]
-                 (?- (lfs-delimited "y" :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
+
+
             )
   )
 
