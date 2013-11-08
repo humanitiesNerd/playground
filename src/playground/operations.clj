@@ -29,6 +29,10 @@
   (i/mmult vector (i/trans vector))
   )
 
+(defn coremult2 [vector y]
+  (i/mmult  y vector)
+  )
+
 (defn coresum [matrix1 matrix2]
   (if (and (i/matrix? matrix1) (i/matrix? matrix2))
     (i/plus matrix1 matrix2)
@@ -44,12 +48,37 @@
   )
 
 (defmapcatop vector-mult-tupla-unica [a b c]
-  [  [[  [a] [3]   ]]  ] ;;una tupla che contiene un vettore che contiene due vettori
+  [  [[  [a] [b] [c]  ]]  ] ;;una tupla che contiene un vettore che contiene due vettori
   )
 
-(defmapcatop vector-mult-seq-di-tuple [a b c]
-  [ [a] [3] ] ;; seq di tuple (ogni tupla deve essere un vettore)
+(defmapcatop vector-mult-seq-di-tuple [a b c d]
+  [ [a] [b] [c] [d]] ;; seq di tuple (ogni tupla deve essere un vettore)
   )
+
+(defmapcatop split-a [linenumber a b c d]
+  [
+
+   [[1 1] ["a"] [a]]
+   [[2 1] ["a"] [b]]
+   [[3 1] ["a"] [c]]
+   [[1 1] ["b"] [d]]
+   [[2 1] ["b"] [d]]
+   [[3 1] ["b"] [d]]
+
+   ]
+
+  )
+
+
+
+(def query4 (<- [?index ?from-matrix ?value]
+                (mymatrix :> ?linenumber ?a ?b ?c)
+                (mycolumnvector :> ?linenumber ?d)
+                (split-a ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?value)
+                ))
+
+
+
 
 ;;(def prima-query (<- [?person] (age ?person 25)))
 ;;(def seconda-query (<- [?person] (person ?person)))
@@ -60,6 +89,7 @@
 
 ;;39, State-gov, 77516, Bachelors, 13, Never-married, Adm-clerical, Not-in-family, White, Male, 2174, 0, 40, United-States, <=50K
 
+(def a-columns 231)
 
 (def lookup-table
   {"US" 1
@@ -98,10 +128,14 @@
 (def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
                (vector-mult ?a ?b ?c :> ?intermediate-matrix)
                (matrix-sum ?intermediate-matrix :> ?tuple)
-
                )
   )
 
+(def query2 (<- [?tupla] (mymatrix :> ?a ?b ?c)
+                (vector-mult-tupla-unica ?a ?b ?c :> ?tupla)))
+
+(def query3 (<- [?tupla] (mymatrix :> ?a ?b ?c)
+                (vector-mult-seq-di-tuple ?a ?b ?c :> ?tupla)))
 
 (defn workflow-demergenza []
   (workflow ["tmp"]
@@ -175,7 +209,13 @@
       )
   )
 
-
+(defn produce-b [tap-a tap-y]
+   (<- [?b]
+       (tap-a ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+              ?marital-status ?occupation ?relationship ?race
+              ?sex ?capital-gain ?capital-loss
+              ?hours-per-week ?native-country)
+       (tap-y ?)))
 
 
 (defn my-workflow [path-to-the-data-file]
@@ -185,8 +225,10 @@
                  )
             y ([:tmp-dirs [staging-y]]
                  (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
-            A ([:deps X]
-                (?- (stdout) (produce-A (source-A staging-X)))
+            A ([:deps X :tmp-dirs [staging-A]]
+                (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (source-A staging-X)))
+                )
+            b ([]
                  )
             )
   )

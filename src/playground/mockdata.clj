@@ -193,18 +193,24 @@
 
 (def mymatrix
  [
-  [1 0 0]
-  [1 0 0]
-  [1 0 0]
+  [1 1 3 7]
+  [2 2 1 1]
+  [3 4 2 1]
  ]
 )
 
-(def myvector
+(def myrowvector
  [
-  [1 1 1]
+  [2 3 5]
  ]
 )
 
+(def mycolumnvector
+  [
+   [1 2]
+   [2 3]
+   [3 5]
+   ])
 
 
 
