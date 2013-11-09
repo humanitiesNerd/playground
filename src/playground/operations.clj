@@ -17,6 +17,8 @@
 ;; let´s bootstrap playground
 (bootstrap)
 
+(def a-columns 231)
+
 (defn transpose
   "can I transpose a matrix with cascalog using incanter.core.trans ?"
 
@@ -41,7 +43,11 @@
   (i/plus (i/matrix matrix1) (i/matrix matrix2))
   )
 
+
 (defparallelagg matrix-sum :init-var #'identity :combine-var #'coresum)
+
+(defbufferop collect-tiles [tuples]
+  (tiles tuples))
 
 (defmapcatop vector-mult [a b c d e f g h i l m n o p]
   [[   (coremult [a b c d e f g h i l m n o p])  ]]
@@ -55,48 +61,47 @@
   [ [a] [b] [c] [d]] ;; seq di tuple (ogni tupla deve essere un vettore)
   )
 
-(defmapcatop split-a [linenumber a b c d]
+
+(defn tiles [tuples]
+  (for [tuple tuples]
+    (let [
+          [from-matrix row column value] tuple
+
+
+
+
+          ]))
+  )
+
+
+(defmapcatop split [linenumber a b c d]
   [
 
-   [[1 1] ["a"] [a]]
-   [[2 1] ["a"] [b]]
-   [[3 1] ["a"] [c]]
-   [[1 1] ["b"] [d]]
-   [[2 1] ["b"] [d]]
-   [[3 1] ["b"] [d]]
+   [[1 1] "a" 1 linenumber a]
+   [[2 1] "a" 2 linenumber b]
+   [[3 1] "a" 3 linenumber c]
+   [[1 1] "b" linenumber 1 d]
+   [[2 1] "b" linenumber 1 d]
+   [[3 1] "b" linenumber 1 d]
 
    ]
 
   )
 
-
-
-(def query4 (<- [?index ?from-matrix ?value]
+(def query4 (<- [?index ?from-matrix ?row ?column ?value]
                 (mymatrix :> ?linenumber ?a ?b ?c)
                 (mycolumnvector :> ?linenumber ?d)
-                (split-a ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?value)
-                ))
+                (split ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?row ?column ?value)
+                )
+  )
 
 
 
 
 ;;(def prima-query (<- [?person] (age ?person 25)))
 ;;(def seconda-query (<- [?person] (person ?person)))
-;;(def terza-query (<- [?persona] (person ?persona)))
-;;(def quarta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
-;;((def quinta-query (<- [?col1 ?col2 ?col3] (mymatrix ?col1 ?col2 ?col3)))
-
 
 ;;39, State-gov, 77516, Bachelors, 13, Never-married, Adm-clerical, Not-in-family, White, Male, 2174, 0, 40, United-States, <=50K
-
-(def a-columns 231)
-
-(def lookup-table
-  {"US" 1
-   "UK" 2
-   "France" 3})
-
-(def input [["US"] ["US"] ["UK"] ["UK"] ["France"]])
 
 (defn my_source [path-to-the-data-file]
        (lfs-delimited path-to-the-data-file
