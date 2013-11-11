@@ -46,26 +46,15 @@
   )
 
 (defn tiles [tuples]
-  (let [local-indices
-        (group-by (fn [tile]
-                    tile)
-                  tuples)
-        ;index-one (((local-indices "a") 0) 2)
-        ;index-two (((local-indices "b") 0) 2)
-        ]
-        ;(reduce +  (map * index-one index-two))
-    )
+  (reduce + (map second tuples))
   )
 
 (defn tiles2 [tiles]
-  (let [a-tile (tiles 0)
-        row    ((a-tile 0) 0)
-        column ((a-tile 0) 1)
-        value   (reduce + (map (fn [tile]
-                   (tile 4))
-                 tiles))
+  (let [
+        value   (reduce + (map second
+                               tiles))
         ]
-    [[row column] value]
+    value
     )
   )
 
@@ -79,7 +68,8 @@
 (defparallelagg matrix-sum :init-var #'identity :combine-var #'coresum)
 
 (defbufferop collect-tiles [tuples]
-  (tiles2 tuples))
+  [(tiles tuples)]
+  )
 
 (defmapcatop vector-mult [a b c d e f g h i l m n o p]
   [[   (coremult [a b c d e f g h i l m n o p])  ]]
@@ -111,12 +101,18 @@
                 (mymatrix :> ?linenumber ?a ?b ?c)
                 (mycolumnvector :> ?linenumber ?d)
                 (split ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?row ?column ?value)
-                (collect-tiles ?value :>  ?cell )
+                (collect-tiles ?from-matrix ?value :>  ?cell )
                 )
   )
 
+ (def test-tap [["a" "b" 1]
+                 ["b" "c" 2]
+                 ["a" "d" 3]])
 
+(defbufferop dosum [tuples] [(reduce + (map second tuples))])
 
+(def query5 (<- [?a ?sum] (test-tap ?a ?b ?c) (dosum ?b ?c :> ?sum))
+  )
 
 ;;(def prima-query (<- [?person] (age ?person 25)))
 ;;(def seconda-query (<- [?person] (person ?person)))
