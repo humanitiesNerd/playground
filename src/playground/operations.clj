@@ -45,7 +45,7 @@
   (i/plus (i/matrix matrix1) (i/matrix matrix2))
   )
 
-(defn tiles [tuples]
+(defn tiles1 [tuples]
   (reduce + (map
              (fn [tuple] (nth tuple 4))
              tuples
@@ -53,18 +53,38 @@
           )
   )
 
+(defn extracted-values [vector-of-vectors]
+  (map (fn [vector] (nth vector 4)) vector-of-vectors ))
+
+
+(defn tiles [tuples]
+  (let [both-collections (vals (group-by (fn [tuple] (tuple 1)) tuples))
+        coll1 (extracted-values  (first both-collections) )
+        coll2 (extracted-values  (second both-collections) )
+        ]
+    (reduce +  (map * coll1 coll2))
+    )
+  )
+
+(defn tiles2 [tuples]
+  11)
+
 
 (def mockdata [
                [[1 1] "a" 1 1 1]
                [[2 1] "a" 2 1 3]
                [[3 1] "b" 1 1 2]
+               [[1 1] "b" 1 1 3]
                ])
 
 (defparallelagg matrix-sum :init-var #'identity :combine-var #'coresum)
 
-(defbufferop collect-tiles [tuples]
-  [(tiles tuples)]
+(defbufferop collect-tiles1 [tuples]
+  [(tiles1 tuples)]
   )
+
+(defbufferop collect-tiles [tuples]
+  [(tiles2 tuples)])
 
 (defmapcatop vector-mult [a b c d e f g h i l m n o p]
   [[   (coremult [a b c d e f g h i l m n o p])  ]]
@@ -96,8 +116,8 @@
                 (mymatrix :> ?linenumber ?a ?b ?c)
                 (mycolumnvector :> ?linenumber ?d)
                 (split ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?row ?column ?value)
-                (collect-tiles ?index ?from-matrix ?row
-                                ?column ?value :>  ?cell )
+                (collect-tiles ?index ?from-matrix ?row ?column ?value :>  ?cell )
+                ;(collect-tiles1 ?index ?from-matrix ?row ?column ?value :>  ?cell )
                 )
   )
 
