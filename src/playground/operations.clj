@@ -6,13 +6,15 @@
         [cascalog.more-taps :only (lfs-delimited)]
         [playground.macros]
 
+
   )
 
   (:require
-            [incanter.core :as i]
+   [incanter.core :as i]
 
-            )
-)
+   )
+
+  )
 
 ;; let´s bootstrap playground
 (bootstrap)
@@ -43,11 +45,41 @@
   (i/plus (i/matrix matrix1) (i/matrix matrix2))
   )
 
+(defn tiles [tuples]
+  (let [local-indices
+        (group-by (fn [tile]
+                    tile)
+                  tuples)
+        ;index-one (((local-indices "a") 0) 2)
+        ;index-two (((local-indices "b") 0) 2)
+        ]
+        ;(reduce +  (map * index-one index-two))
+    )
+  )
+
+(defn tiles2 [tiles]
+  (let [a-tile (tiles 0)
+        row    ((a-tile 0) 0)
+        column ((a-tile 0) 1)
+        value   (reduce + (map (fn [tile]
+                   (tile 4))
+                 tiles))
+        ]
+    [[row column] value]
+    )
+  )
+
+
+(def mockdata [
+               [[1 1] "a" 1 1 1]
+               [[2 1] "a" 2 1 3]
+               [[3 1] "b" 1 1 2]
+               ])
 
 (defparallelagg matrix-sum :init-var #'identity :combine-var #'coresum)
 
 (defbufferop collect-tiles [tuples]
-  (tiles tuples))
+  (tiles2 tuples))
 
 (defmapcatop vector-mult [a b c d e f g h i l m n o p]
   [[   (coremult [a b c d e f g h i l m n o p])  ]]
@@ -60,19 +92,6 @@
 (defmapcatop vector-mult-seq-di-tuple [a b c d]
   [ [a] [b] [c] [d]] ;; seq di tuple (ogni tupla deve essere un vettore)
   )
-
-
-(defn tiles [tuples]
-  (for [tuple tuples]
-    (let [
-          [from-matrix row column value] tuple
-
-
-
-
-          ]))
-  )
-
 
 (defmapcatop split [linenumber a b c d]
   [
@@ -88,10 +107,11 @@
 
   )
 
-(def query4 (<- [?index ?from-matrix ?row ?column ?value]
+(def query4 (<- [?index ?cell]
                 (mymatrix :> ?linenumber ?a ?b ?c)
                 (mycolumnvector :> ?linenumber ?d)
                 (split ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?row ?column ?value)
+                (collect-tiles ?value :>  ?cell )
                 )
   )
 
@@ -220,7 +240,8 @@
               ?marital-status ?occupation ?relationship ?race
               ?sex ?capital-gain ?capital-loss
               ?hours-per-week ?native-country)
-       (tap-y ?)))
+       ;(tap-y ?)
+       ))
 
 
 (defn my-workflow [path-to-the-data-file]
