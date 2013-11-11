@@ -46,16 +46,11 @@
   )
 
 (defn tiles [tuples]
-  (reduce + (map second tuples))
-  )
-
-(defn tiles2 [tiles]
-  (let [
-        value   (reduce + (map second
-                               tiles))
-        ]
-    value
-    )
+  (reduce + (map
+             (fn [tuple] (nth tuple 4))
+             tuples
+             )
+          )
   )
 
 
@@ -101,7 +96,8 @@
                 (mymatrix :> ?linenumber ?a ?b ?c)
                 (mycolumnvector :> ?linenumber ?d)
                 (split ?linenumber ?a ?b ?c ?d  :> ?index ?from-matrix ?row ?column ?value)
-                (collect-tiles ?from-matrix ?value :>  ?cell )
+                (collect-tiles ?index ?from-matrix ?row
+                                ?column ?value :>  ?cell )
                 )
   )
 
@@ -153,7 +149,7 @@
   )
 
 (def query2 (<- [?tupla] (mymatrix :> ?a ?b ?c)
-                (vector-mult-tupla-unica ?a ?b ?c :> ?tupla)))
+                 (vector-mult-tupla-unica ?a ?b ?c :> ?tupla)))
 
 (def query3 (<- [?tupla] (mymatrix :> ?a ?b ?c)
                 (vector-mult-seq-di-tuple ?a ?b ?c :> ?tupla)))
