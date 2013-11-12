@@ -71,9 +71,9 @@
 
 
 (def mockdata [
-               [[1 1] "a" 1 1 1]
+               [[1 1] "a" 1 1 7]
                [[2 1] "a" 2 1 3]
-               [[3 1] "b" 1 1 2]
+               [[3 1] "b" 1 1 5]
                [[1 1] "b" 1 1 3]
                ])
 
@@ -84,7 +84,8 @@
   )
 
 (defbufferop collect-tiles [tuples]
-  [(tiles2 tuples)])
+  [(tiles tuples)]
+  )
 
 (defmapcatop vector-mult [a b c d e f g h i l m n o p]
   [[   (coremult [a b c d e f g h i l m n o p])  ]]
