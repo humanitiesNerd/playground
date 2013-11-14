@@ -10,10 +10,10 @@
                 [cascalog/cascalog-more-taps "1.10.2"]
                 [incanter/incanter-core "1.3.0"]
                 [org.clojure/tools.namespace "0.2.4"]
+                [org.apache.hadoop/hadoop-core "1.0.3"]
                 ]
   :profiles { :dev
                   {:dependencies [
-
                                  [org.apache.hadoop/hadoop-core "1.0.3"
                                  :exclusions [
                                             

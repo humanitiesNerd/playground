@@ -9,10 +9,7 @@
 
   )
 
-  (:require
-   [incanter.core :as i]
-
-   )
+  (:require [incanter.core :as i])
 
   )
 
@@ -71,9 +68,9 @@
   [(tiles tuples)]
   )
 
-(defmapcatop vector-mult [a b c d e f g h i l m n o p]
-  [[   (coremult [a b c d e f g h i l m n o p])  ]]
-  )
+;(defmapcatop vector-mult [a b c d e f g h i l m n o p]
+;  [[   (coremult [a b c d e f g h i l m n o p])  ]]
+;)
 
 (defmapcatop vector-mult-tupla-unica [a b c]
   [  [[  [a] [b] [c]  ]]  ] ;;una tupla che contiene un vettore che contiene due vettori
@@ -131,26 +128,28 @@
        )
 )
 
-(defn source-A [path-to-the-data-file]
-       (lfs-delimited path-to-the-data-file
-                                       :delimiter ", "
-                                       :classes [Integer Integer Integer Integer Integer Integer Integer
-                                                 Integer Integer Integer Integer Integer Integer Integer
-                                                 Integer]
-                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
-                                                   "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
-                                                   "?hours-per-week" "?native-country" ]
-       )
-)
+; not really needed!
+
+;(defn source-A [path-to-the-data-file]
+;      (lfs-delimited path-to-the-data-file
+;                                       :delimiter ", "
+;                                       :classes [Integer Integer Integer Integer Integer Integer Integer
+;                                                 Integer Integer Integer Integer Integer Integer Integer
+;                                                 Integer]
+;                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+;                                                   "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
+;                                                   "?hours-per-week" "?native-country" ]
+;       )
+;)
 
 
 ;;  (?- (stdout) my_source)
 
-(def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
-               (vector-mult ?a ?b ?c :> ?intermediate-matrix)
-               (matrix-sum ?intermediate-matrix :> ?tuple)
-               )
-  )
+;(def query (<- [?tuple] (mymatrix :> ?a ?b ?c)
+;               (vector-mult ?a ?b ?c :> ?intermediate-matrix)
+;               (matrix-sum ?intermediate-matrix :> ?tuple)
+;               )
+;  )
 
 (def query2 (<- [?tupla] (mymatrix :> ?a ?b ?c)
                 (vector-mult-tupla-unica ?a ?b ?c :> ?tupla)))
@@ -158,10 +157,10 @@
 (def query3 (<- [?tupla] (mymatrix :> ?a ?b ?c)
                 (vector-mult-seq-di-tuple ?a ?b ?c :> ?tupla)))
 
-(defn workflow-demergenza []
-  (workflow ["tmp"]
-            only-step ([]
-                         (?- (stdout) query))))
+;(defn workflow-demergenza []
+;  (workflow ["tmp"]
+;            only-step ([]
+;                         (?- (stdout) query))))
 
 ;;(def mockquery
 ;;  (<- [!input !id]
@@ -207,25 +206,29 @@
    )
   )
 
-(defn produce-y [data-source-tap]
-  (<- [?y]
-      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
-                       ?marital-status ?occupation ?relationship ?race
-                       ?sex ?capital-gain ?capital-loss
-                       ?hours-per-week ?native-country ?income-treshold)
-      (extract-y ?income-treshold :> ?y)))
+(defmapcatop extract-y [income-treshold]
+  (cond (= income-treshold "<=50K")
+     [0] :else [1])
+)
 
+(defn produce-y [data-source-tap]
+  (<- [?cl]
+      ((select-fields data-source-tap ["?income-treshold"]) ?income-treshold)
+      (extract-y ?income-treshold :> ?cl)
+))
+
+(defn to-int-vector [line]
+  (map #(Integer/parseInt %) (clojure.string/split line #", "))
+)
+
+(defmapcatop vectormult [line]
+  [[(coremult (to-int-vector line))]]
+)
 
 (defn produce-A [tap]
-  (<- [?final-matrix]
-      (tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
-           ?marital-status ?occupation ?relationship ?race
-           ?sex ?capital-gain ?capital-loss
-           ?hours-per-week ?native-country)
-      (vector-mult ?age ?workclass ?fnlwgt ?education ?education-num
-                   ?marital-status ?occupation ?relationship ?race
-                   ?sex ?capital-gain ?capital-loss
-                   ?hours-per-week ?native-country :> ?intermediate-matrix)
+  (<- [?final-matrix]      
+      (tap ?line)
+      (vectormult ?line :> ?intermediate-matrix)
       (matrix-sum ?intermediate-matrix :> ?final-matrix)
       )
   )
@@ -248,7 +251,7 @@
             y ([:tmp-dirs [staging-y]]
                  (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
             A ([:deps X :tmp-dirs [staging-A]]
-                (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (source-A staging-X)))
+                (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X)))
                 )
             b ([]
                  )
