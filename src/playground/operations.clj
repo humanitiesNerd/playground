@@ -119,10 +119,10 @@
 (defn my_source [path-to-the-data-file]
        (lfs-delimited path-to-the-data-file
                                        :delimiter ", "
-                                       :classes [Integer Integer String Integer String Integer
+                                       :classes [Integer String Integer String Integer
                                                  String String String String String Integer
                                                  Integer Integer String String]
-                                       :outfields ["?linenumber" "?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+                                       :outfields ["?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
                                                    "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
                                                    "?hours-per-week" "?native-country" "?income-treshold"]
        )
@@ -172,7 +172,7 @@
 ;;)
 
 (defn produce-X [data-source-tap]
-  (<- [?linenumber
+  (<- [
        ?age
        ?workclass-out
        ?fnlwgt
@@ -189,7 +189,7 @@
        ?native-country-out
 
        ]
-      (data-source-tap ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+      (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
                        ?sex ?capital-gain ?capital-loss
                        ?hours-per-week ?native-country ?income-treshold)
@@ -202,7 +202,6 @@
       (convert-to-numbers  :race ?race :> ?race-out)
       (convert-to-numbers  :sex ?sex :> ?sex-out)
       (convert-to-numbers  :native-country ?native-country :> ?native-country-out)
-
    )
   )
 
@@ -235,7 +234,7 @@
 
 (defn produce-b [tap-a tap-y]
    (<- [?b]
-       (tap-a ?linenumber ?age ?workclass ?fnlwgt ?education ?education-num
+       (tap-a ?age ?workclass ?fnlwgt ?education ?education-num
               ?marital-status ?occupation ?relationship ?race
               ?sex ?capital-gain ?capital-loss
               ?hours-per-week ?native-country)
