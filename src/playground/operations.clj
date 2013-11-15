@@ -206,17 +206,16 @@
    )
   )
 
-(defmapcatop extract-y [income-treshold]
+(defn extract-y [income-treshold]
   (if (= income-treshold "<= 50k")
     0
-    1)
-)
+    1))
 
 (defn produce-y [data-source-tap]
   (<- [?y]
       ((select-fields data-source-tap ["?income-treshold"]) ?income-treshold)
       (extract-y ?income-treshold :> ?y)
-))
+      ))
 
 (defn to-int-vector [line]
   (map #(Integer/parseInt %) (clojure.string/split line #", "))
