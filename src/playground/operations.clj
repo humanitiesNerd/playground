@@ -207,14 +207,15 @@
   )
 
 (defmapcatop extract-y [income-treshold]
-  (cond (= income-treshold "<=50K")
-     [0] :else [1])
+  (if (= income-treshold "<= 50k")
+    0
+    1)
 )
 
 (defn produce-y [data-source-tap]
-  (<- [?cl]
+  (<- [?y]
       ((select-fields data-source-tap ["?income-treshold"]) ?income-treshold)
-      (extract-y ?income-treshold :> ?cl)
+      (extract-y ?income-treshold :> ?y)
 ))
 
 (defn to-int-vector [line]
@@ -226,7 +227,7 @@
 )
 
 (defn produce-A [tap]
-  (<- [?final-matrix]      
+  (<- [?final-matrix]
       (tap ?line)
       (vectormult ?line :> ?intermediate-matrix)
       (matrix-sum ?intermediate-matrix :> ?final-matrix)
@@ -250,11 +251,11 @@
                  )
             y ([:tmp-dirs [staging-y]]
                  (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
-            A ([:deps X :tmp-dirs [staging-A]]
-                (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X)))
-                )
-            b ([]
-                 )
+
+           A  ([:deps X :tmp-dirs [staging-A]]
+               (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X)))
+               )
+
             )
   )
 
