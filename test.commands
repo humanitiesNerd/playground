@@ -3,7 +3,7 @@
 (use 'cascalog.api)
 (use '[cascalog.more-taps :only (lfs-delimited)])
 
-(?- (lfs-delimited "matrix-x" :delimiter ", " :sinkmode :replace) (produce-X (my_source "adult.data.with.line.number.100")))
-(?- (lfs-delimited "vector-y" :sinkmode :replace) (produce-y (my_source "adult.data.with.line.number.100")))
+(?- (lfs-delimited "matrix-x" :delimiter ", " :sinkmode :replace) (produce-X (my_source "adult/adult.data")))
+(?- (lfs-delimited "vector-y" :sinkmode :replace) (produce-y (my_source "adult/adult.data)))
 (?- (lfs-delimited "matrix-a" :delimiter ", " :sinkmode :replace) (produce-A (lfs-textline "matrix-x")))
 

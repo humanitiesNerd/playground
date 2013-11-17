@@ -16,18 +16,17 @@
 ;; let´s bootstrap playground
 (bootstrap)
 
-(def a-columns 231)
-
 (defn transpose
   "can I transpose a matrix with cascalog using incanter.core.trans ?"
-
   []
   (let [transposed (i/trans mymatrix)]
    transposed)
 )
 
+
 (defn coremult [vector]
-  (i/mmult vector (i/trans vector))
+  (let [without-y (subvec vector 0 (- (count vector) 1))]
+    (i/mmult without-y (i/trans without-y)))
   )
 
 (defn coremult2 [vector]
@@ -63,6 +62,10 @@
 
 
 ;;  (?- (stdout) my_source)
+(defn extract-y [income-treshold]
+  (if (= income-treshold "<= 50k")
+    0
+    1))
 
 
 (defn produce-X [data-source-tap]
@@ -81,7 +84,7 @@
        ?capital-loss
        ?hours-per-week
        ?native-country-out
-
+       ?income-treshold-out
        ]
       (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
                        ?marital-status ?occupation ?relationship ?race
@@ -95,22 +98,13 @@
       (convert-to-numbers  :race ?race :> ?race-out)
       (convert-to-numbers  :sex ?sex :> ?sex-out)
       (convert-to-numbers  :native-country ?native-country :> ?native-country-out)
+      (extract-y ?income-treshold :> ?income-treshold-out)
    )
   )
 
-(defn extract-y [income-treshold]
-  (if (= income-treshold "<= 50k")
-    0
-    1))
-
-(defn produce-y [data-source-tap]
-  (<- [?y]
-      ((select-fields data-source-tap ["?income-treshold"]) ?income-treshold)
-      (extract-y ?income-treshold :> ?y)
-      ))
 
 (defn to-int-vector [line]
-  (map #(Integer/parseInt %) (clojure.string/split line #", "))
+  (vec (map #(Integer/parseInt %) (clojure.string/split line #", ")))
 )
 
 (defmapcatop vectormult [line]
@@ -135,8 +129,7 @@
        (tap-x ?line)
        ;(tap-y ?y)
        (vectormult2 ?line :> ?intermediate-vector)
-       (matrix-sum ?intermediate-vector :> ?final-vector)
-       ))
+       (matrix-sum ?intermediate-vector :> ?final-vector)))
 
 
 (defn my-workflow [path-to-the-data-file]
@@ -144,15 +137,7 @@
             X  ([:tmp-dirs [staging-X]]
                  (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  )
-            y  ([:tmp-dirs [staging-y]]
-                 (?- (lfs-delimited staging-y :sinkmode :replace) (produce-y (my_source path-to-the-data-file)) ))
-
             A  ([:deps X :tmp-dirs [staging-A]]
-               (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X)))
-               )
-            b  ([:deps [A y] :tmp-dirs [staging-b]]
-                (?- (lfs-delimited staging-b :sinkmode :replace) (produce-b (lfs-textline staging-A) (lfs-textline staging-y))))
-            )
-  )
+               (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X))))))
 
 ;; (my-workflow "" "./outputDiCascalog")
