@@ -30,9 +30,9 @@
   )
 
 (defn coremult2 [vector]
-  (let [y (peek vector)]
-    (i/mult y vector))
-  )
+  (let [y (peek vector)
+        without-y (subvec vector 0 (- (count vector) 1))]
+    (i/mult y (i/matrix  without-y))))
 
 (defn coresum [matrix1 matrix2]
   (if (and (i/matrix? matrix1) (i/matrix? matrix2))
@@ -111,8 +111,8 @@
   [[(coremult (to-int-vector line))]]
 )
 
-(defmapcatop vectormult2 [line number]
-  [[(coremult2 (to-int-vector line) number)]]
+(defmapcatop vectormult2 [line]
+  [[(coremult2 (to-int-vector line))]]
 )
 
 
@@ -124,12 +124,12 @@
       )
   )
 
-(defn produce-b [tap-x tap-y]
+(defn produce-b [tap]
    (<- [?final-vector]
-       (tap-x ?line)
-       ;(tap-y ?y)
+       (tap ?line)
        (vectormult2 ?line :> ?intermediate-vector)
-       (matrix-sum ?intermediate-vector :> ?final-vector)))
+       (matrix-sum ?intermediate-vector :> ?final-vector)
+       ))
 
 
 (defn my-workflow [path-to-the-data-file]
@@ -138,6 +138,8 @@
                  (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  )
             A  ([:deps X :tmp-dirs [staging-A]]
-               (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X))))))
+                  (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X))))
+            b ([:deps X :tmp-dirs [staging-b]]
+                (?- (lfs-delimited staging-b :sinkmode :replace) (produce-b (lfs-textline staging-X))) )))
 
 ;; (my-workflow "" "./outputDiCascalog")
