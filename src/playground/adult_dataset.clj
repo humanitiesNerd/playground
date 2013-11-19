@@ -3,6 +3,8 @@
         [clojure.tools.namespace.repl :only (refresh)]
         [playground.mockdata]
         [cascalog.more-taps :only (lfs-delimited)]
+        [cascalog.checkpoint]
+
 
   )
 
@@ -105,4 +107,19 @@
                                                    "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
                                                    "?hours-per-week" "?native-country" "?income-treshold"]
        )
-)
+       )
+
+
+(defn write-out [tap]
+  (<- [?line]
+      (tap ?line)))
+
+(defn preparing-X [path-to-the-data-file]
+  (workflow ["preparing-X-temp"]
+            X  ([:tmp-dirs [staging-X]]
+                 (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+                 )
+            write-out ([:deps X]
+                         (?- (lfs-delimited "A-matrix" :sinkmode :replace) (write-out (lfs-textline staging-X))))))
+
+;; (my-workflow "" "./outputDiCascalog")
