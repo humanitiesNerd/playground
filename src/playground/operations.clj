@@ -73,10 +73,6 @@
        (matrix-sum ?intermediate-vector :> ?final-vector)
        ))
 
-(defn write-out [tap]
-  (<- [?line]
-      (tap ?line)))
-
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
             X  ([:tmp-dirs [staging-X]]
