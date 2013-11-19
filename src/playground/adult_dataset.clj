@@ -116,10 +116,9 @@
 
 (defn preparing-X [path-to-the-data-file]
   (workflow ["preparing-X-temp"]
-            X  ([:tmp-dirs [staging-X]]
-                 (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
+            X  ([]
+                 (?- (lfs-delimited "X-matrix" :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  )
-            write-out ([:deps X]
-                         (?- (lfs-delimited "A-matrix" :sinkmode :replace) (write-out (lfs-textline staging-X))))))
+            ))
 
 ;; (my-workflow "" "./outputDiCascalog")

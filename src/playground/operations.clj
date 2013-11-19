@@ -79,7 +79,7 @@
                  (?- (lfs-delimited staging-X :delimiter ", " :sinkmode :replace)  (produce-X (my_source path-to-the-data-file)))
                  )
             A  ([:deps X :tmp-dirs [staging-A]]
-                  (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline "matrix-x"))))
+                  (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline "X-matrix"))))
             b ([:deps X :tmp-dirs [staging-b]]
                  (?- (lfs-delimited staging-b :sinkmode :replace) (produce-b (lfs-textline staging-X))) )
             write-out ([:deps [A b]]
