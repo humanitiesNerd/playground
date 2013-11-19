@@ -1,11 +1,14 @@
-(ns playground.macros
+(ns playground.adult-dataset
   (:use
         [clojure.tools.namespace.repl :only (refresh)]
+        [playground.mockdata]
+        [cascalog.more-taps :only (lfs-delimited)]
 
   )
 
 )
 
+(bootstrap)
 
 (def from-strings-to-numbers
   {:workclass
@@ -50,10 +53,56 @@
   (get-in from-strings-to-numbers (into [] lookup-keys))
   )
 
-(defmacro lookup [lookup-key]
-  `(lookup-proxy ~lookup-key
-                 ~(symbol (str "?" (subs (str lookup-key) 1)))
-                 ~(symbol ":>")
-                 ~(symbol   (str  (subs  (str lookup-key) 1) "-out"))
-                 )
+
+(defn extract-y [income-treshold]
+  (if (= income-treshold "<= 50k")
+    0
+    1))
+
+
+(defn produce-X [data-source-tap]
+  (<- [
+       ?age
+       ?workclass-out
+       ?fnlwgt
+       ?education-out
+       ?education-num
+       ?marital-status-out
+       ?occupation-out
+       ?relationship-out
+       ?race-out
+       ?sex-out
+       ?capital-gain
+       ?capital-loss
+       ?hours-per-week
+       ?native-country-out
+       ?income-treshold-out
+       ]
+      (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
+                       ?marital-status ?occupation ?relationship ?race
+                       ?sex ?capital-gain ?capital-loss
+                       ?hours-per-week ?native-country ?income-treshold)
+      (convert-to-numbers  :workclass ?workclass :> ?workclass-out)
+      (convert-to-numbers  :education ?education :> ?education-out)
+      (convert-to-numbers  :marital-status ?marital-status :> ?marital-status-out)
+      (convert-to-numbers  :occupation ?occupation :> ?occupation-out)
+      (convert-to-numbers  :relationship ?relationship :> ?relationship-out)
+      (convert-to-numbers  :race ?race :> ?race-out)
+      (convert-to-numbers  :sex ?sex :> ?sex-out)
+      (convert-to-numbers  :native-country ?native-country :> ?native-country-out)
+      (extract-y ?income-treshold :> ?income-treshold-out)
+   )
   )
+
+
+(defn my_source [path-to-the-data-file]
+       (lfs-delimited path-to-the-data-file
+                                       :delimiter ", "
+                                       :classes [Integer String Integer String Integer
+                                                 String String String String String Integer
+                                                 Integer Integer String String]
+                                       :outfields ["?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
+                                                   "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
+                                                   "?hours-per-week" "?native-country" "?income-treshold"]
+       )
+)

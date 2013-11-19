@@ -1,10 +1,11 @@
 (ns playground.operations
   (:use
-        [playground.mockdata]
-        [cascalog.checkpoint]
-        [clojure.tools.namespace.repl :only (refresh)]
-        [cascalog.more-taps :only (lfs-delimited)]
-        [playground.macros]
+
+   [playground.mockdata]
+   [cascalog.checkpoint]
+   [clojure.tools.namespace.repl :only (refresh)]
+   [cascalog.more-taps :only (lfs-delimited)]
+   [playground.adult-dataset]
 
 
   )
@@ -15,13 +16,6 @@
 
 ;; let´s bootstrap playground
 (bootstrap)
-
-(defn transpose
-  "can I transpose a matrix with cascalog using incanter.core.trans ?"
-  []
-  (let [transposed (i/trans mymatrix)]
-   transposed)
-)
 
 
 (defn coremult [vector]
@@ -48,59 +42,7 @@
 
 ;;39, State-gov, 77516, Bachelors, 13, Never-married, Adm-clerical, Not-in-family, White, Male, 2174, 0, 40, United-States, <=50K
 
-(defn my_source [path-to-the-data-file]
-       (lfs-delimited path-to-the-data-file
-                                       :delimiter ", "
-                                       :classes [Integer String Integer String Integer
-                                                 String String String String String Integer
-                                                 Integer Integer String String]
-                                       :outfields ["?age" "?workclass" "?fnlwgt" "?education" "?education-num" "?marital-status"
-                                                   "?occupation" "?relationship" "?race" "?sex" "?capital-gain" "?capital-loss"
-                                                   "?hours-per-week" "?native-country" "?income-treshold"]
-       )
-)
 
-
-;;  (?- (stdout) my_source)
-(defn extract-y [income-treshold]
-  (if (= income-treshold "<= 50k")
-    0
-    1))
-
-
-(defn produce-X [data-source-tap]
-  (<- [
-       ?age
-       ?workclass-out
-       ?fnlwgt
-       ?education-out
-       ?education-num
-       ?marital-status-out
-       ?occupation-out
-       ?relationship-out
-       ?race-out
-       ?sex-out
-       ?capital-gain
-       ?capital-loss
-       ?hours-per-week
-       ?native-country-out
-       ?income-treshold-out
-       ]
-      (data-source-tap ?age ?workclass ?fnlwgt ?education ?education-num
-                       ?marital-status ?occupation ?relationship ?race
-                       ?sex ?capital-gain ?capital-loss
-                       ?hours-per-week ?native-country ?income-treshold)
-      (convert-to-numbers  :workclass ?workclass :> ?workclass-out)
-      (convert-to-numbers  :education ?education :> ?education-out)
-      (convert-to-numbers  :marital-status ?marital-status :> ?marital-status-out)
-      (convert-to-numbers  :occupation ?occupation :> ?occupation-out)
-      (convert-to-numbers  :relationship ?relationship :> ?relationship-out)
-      (convert-to-numbers  :race ?race :> ?race-out)
-      (convert-to-numbers  :sex ?sex :> ?sex-out)
-      (convert-to-numbers  :native-country ?native-country :> ?native-country-out)
-      (extract-y ?income-treshold :> ?income-treshold-out)
-   )
-  )
 
 
 (defn to-int-vector [line]
@@ -131,6 +73,9 @@
        (matrix-sum ?intermediate-vector :> ?final-vector)
        ))
 
+(defn write-out [tap]
+  (<- [?line]
+      (tap ?line)))
 
 (defn my-workflow [path-to-the-data-file]
   (workflow ["temporary-folder"]
@@ -140,6 +85,9 @@
             A  ([:deps X :tmp-dirs [staging-A]]
                   (?- (lfs-delimited staging-A :sinkmode :replace) (produce-A (lfs-textline staging-X))))
             b ([:deps X :tmp-dirs [staging-b]]
-                (?- (lfs-delimited staging-b :sinkmode :replace) (produce-b (lfs-textline staging-X))) )))
+                 (?- (lfs-delimited staging-b :sinkmode :replace) (produce-b (lfs-textline staging-X))) )
+            write-out ([:deps [A b]]
+                         (?- (lfs-delimited "A-matrix" :sinkmode :replace) (write-out (lfs-textline staging-A)))
+                         (?- (lfs-delimited "b-vector" :sinkmode :replace) (write-out (lfs-textline staging-b))))))
 
 ;; (my-workflow "" "./outputDiCascalog")
