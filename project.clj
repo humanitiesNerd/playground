@@ -7,10 +7,11 @@
   :dependencies [
                 [org.clojure/clojure "1.5.1"]
                 [cascalog/cascalog-core "2.0.0"]
-                ;;[cascalog/cascalog-more-taps "1.10.2"]
+                [cascalog/cascalog-more-taps "2.0.0" ]
+                [cascalog/cascalog-checkpoint "2.0.0"]
                 [incanter/incanter-core "1.3.0"]
                 [org.clojure/tools.namespace "0.2.4"]
-                ;;[matchure "0.10.1"]
+                [matchure "0.10.1"]
                 ]
   :profiles { :dev
                   {:dependencies [
@@ -22,7 +23,8 @@
                                  ]
                                  ]
                    }
-:repositories {"conjars" "http://conjars.org/repo"}
 
-  }
+
+             }
+    :repositories {"conjars" "http://conjars.org/repo"}
 )

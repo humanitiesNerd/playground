@@ -1,5 +1,5 @@
 (ns playground.mockdata
-  (:require [cascalog.conf :as conf] cascalog.api)
+  (:require [cascalog.cascading.conf :as conf])
   (:import [java.io PrintStream]
            [cascalog WriterOutputStream]
            [org.apache.log4j Logger WriterAppender SimpleLayout]))
@@ -8,7 +8,7 @@
   (use 'cascalog.api
        '[jackknife.seq :only (find-first)])
   (conf/set-job-conf! {"io.sort.mb" 1})
-  (require '(cascalog [workflow :as w]
+  (require '(cascalog.logic 
                       [ops :as c]
                       [vars :as v])))
 
@@ -24,6 +24,7 @@
             Api$FirstNArgs Option]
           '[jcascalog.op Sum Count Div Plus Minus Multiply Avg
             Max Min Limit LimitRank ReParse DistinctCount]))
+
 
 (def person
   [

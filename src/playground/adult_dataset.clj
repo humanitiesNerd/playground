@@ -2,9 +2,9 @@
   (:use
         [clojure.tools.namespace.repl :only (refresh)]
         [playground.mockdata]
-        [cascalog.more-taps :only (lfs-delimited)]
+        [cascalog.more-taps  :only (lfs-delimited)]
         [cascalog.checkpoint]
-        [matchure]
+
 
   )
 
@@ -62,10 +62,7 @@
     1))
 
 
-(defn extract-y-2 [a]
-  (if-match [a "<= 50k"]
-            0
-            1))
+
 
 (defn produce-X [data-source-tap]
   (<- [
