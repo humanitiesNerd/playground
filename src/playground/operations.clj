@@ -5,6 +5,7 @@
    [cascalog.checkpoint]
    [clojure.tools.namespace.repl :only (refresh)]
    [cascalog.more-taps :only (lfs-delimited)]
+   [midje.cascalog]
    [playground.adult-dataset]
 
 
@@ -65,6 +66,7 @@
       (matrix-sum ?intermediate-matrix :> ?final-matrix)
       )
   )
+
 
 (defn produce-b [tap]
    (<- [?final-vector]
