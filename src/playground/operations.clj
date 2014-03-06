@@ -66,6 +66,7 @@
       (matrix-sum ?intermediate-matrix :> ?final-matrix)
       ))
 
+
 (fact
  (produce-A (lfs-textline "X-matrix/tests.txt")) => (produces [[13.0 21.0 21.0 34.0]]))
 
